@@ -6,14 +6,6 @@ import { Image, SimpleGrid, Tooltip } from '@chakra-ui/react'
 
 
 const APIKEY = process.env.NEXT_PUBLIC_GC_API_KEY
-const SCORERID = process.env.NEXT_PUBLIC_GC_SCORER_ID
-
-// endpoint for submitting passport
-const SUBMIT_PASSPORT_URI = 'https://api.scorer.gitcoin.co/registry/submit-passport'
-// endpoint for getting the signing message
-const SIGNING_MESSAGE_URI = 'https://api.scorer.gitcoin.co/registry/signing-message'
-// score needed to see hidden message
-const thresholdNumber = 20
 const headers = APIKEY ? ({
   'Content-Type': 'application/json',
   'X-API-Key': APIKEY
@@ -25,7 +17,6 @@ interface Stamp {
   stamp: string
   icon: string
 }
-
 
 export default function Passport() {
   // here we deal with any local state we need to manage
@@ -59,18 +50,6 @@ export default function Passport() {
     }
   }
 
-  async function getSigningMessage() {
-    try {
-      const response = await fetch(SIGNING_MESSAGE_URI, {
-        headers
-      })
-      const json = await response.json()
-      return json
-    } catch (err) {
-      console.log('error: ', err)
-    }
-  }
-
   async function getStamps() {
     console.log("in getStamps()")
     const stampProviderArray = []
@@ -93,33 +72,6 @@ export default function Passport() {
     }
   }
 
-
-  async function submitPassport() {
-    try {
-      // call the API to get the signing message and the nonce
-      const { message, nonce } = await getSigningMessage()
-      const provider = new ethers.BrowserProvider(window.ethereum)
-      const signer = await provider.getSigner()
-      // ask the user to sign the message
-      const signature = await signer.signMessage(message)
-      // call the API, sending the signing message, the signature, and the nonce
-      const response = await fetch(SUBMIT_PASSPORT_URI, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({
-          address,
-          scorer_id: SCORERID,
-          signature,
-          nonce
-        })
-      })
-
-      const data = await response.json()
-      console.log('data:', data)
-    } catch (err) {
-      console.log('error: ', err)
-    }
-  }
 
   const StampCollection = () => {
     return (
@@ -145,7 +97,6 @@ export default function Passport() {
       <ChakraProvider >
         <Flex minWidth='max-content' alignItems='right' gap='2' justifyContent='right'>
           <Button colorScheme='teal' variant='outline' onClick={connect}>Connect Wallet</Button>
-          <Button colorScheme='teal' variant='outline' onClick={submitPassport}>Connect Passport</Button>
           <Button colorScheme='teal' variant='outline' onClick={getStamps}>Show Stamps</Button>
         </Flex>
         <br />
