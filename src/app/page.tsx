@@ -51,8 +51,7 @@ export default function Passport() {
   }
 
   async function getStamps() {
-    console.log("in getStamps()")
-    const stampProviderArray = []
+    const stampDataArray = []
     const GET_PASSPORT_STAMPS_URI = `https://api.scorer.gitcoin.co/registry/stamps/${address}?include_metadata=true`
     try {
       const response: Response = await fetch(GET_PASSPORT_STAMPS_URI, { headers })
@@ -61,10 +60,10 @@ export default function Passport() {
       let counter = 0
       for (const i of data.items) {
         let st = { id: counter, stamp: i.credential.credentialSubject.provider, icon: i.metadata.platform.icon }
-        stampProviderArray.push(st)
+        stampDataArray.push(st)
         counter += 1
       }
-      setStampArray(stampProviderArray)
+      setStampArray(stampDataArray)
       setShowStamps(true)
       return
     } catch (err) {
